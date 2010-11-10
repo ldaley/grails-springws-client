@@ -19,23 +19,24 @@ import grails.plugin.springwsclient.template.*
 import org.slf4j.LoggerFactory
 
 class SpringwsClientGrailsPlugin {
+	def title = "SpringWS Client"
 	def version = "0.1"
+	def description = 'Integrates the client side aspects of the SpringWS library'
+	def author = "Luke Daley"
+	def authorEmail = "ld@ldaley.com"
+	def documentation = "http://grails.org/plugin/springws-client"
+
 	def grailsVersion = "1.3.5 > *"
 	def dependsOn = [:]
+	def loadAfter = ['services']
+
 	def pluginExcludes = [
 		"grails-app/views/error.gsp",
 		"**/grails/plugin/springwsclient/test/**/*"
 	]
 
-	def author = "Luke Daley"
-	def authorEmail = "ld@ldaley.com"
-	def title = "SpringWS Client"
-	def description = 'Integrates the client side aspects of the SpringWS library'
 
-	def loadAfter = ['services']
-	def documentation = "http://grails.org/plugin/springws-client"
-
-	def adapters = []
+	private adapters = []
 	
 	def doWithSpring = {
 		def templateBuilder = new TemplateBuilder(delegate)
