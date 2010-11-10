@@ -29,6 +29,6 @@ class DoublingService {
 	}
 
 	def doubleIt(num) {
-		doublingWsClient.marshalSendAndReceive("absd") { number(num.toString()) }.text().toInteger()
+		doublingWsClient.marshalSendAndReceive { number(num.toString()) }.text().toInteger()
 	}
 }
