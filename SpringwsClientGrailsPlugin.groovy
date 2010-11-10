@@ -15,7 +15,8 @@
  */
 
 import grails.plugin.springwsclient.template.*
-import org.springframework.ws.client.core.WebServiceTemplate
+
+import org.slf4j.LoggerFactory
 
 class SpringwsClientGrailsPlugin {
 	def version = "0.1"
@@ -31,6 +32,7 @@ class SpringwsClientGrailsPlugin {
 	def title = "SpringWS Client"
 	def description = 'Integrates the client side aspects of the SpringWS library'
 
+	def loadAfter = ['services']
 	def documentation = "http://grails.org/plugin/springws-client"
 
 	def adapters = []
@@ -38,12 +40,19 @@ class SpringwsClientGrailsPlugin {
 	def doWithSpring = {
 		def templateBuilder = new TemplateBuilder(delegate)
 		def parameterSource = new ApplicationConfigParameterSource(application)
-		def defaultTemplateConfig = new TemplateConfig(templateClass: WebServiceTemplate)
+		def defaultTemplateConfig = new TemplateConfig(templateClass: GroovyWebServiceTemplate)
 		def templateConfigFactory = new DefaultCloningTemplateConfigFactory(defaultTemplateConfig, parameterSource)
 		
 		for (serviceClass in application.serviceClasses) {
 			if (!ServiceTemplatesAdapter.getDefinitions(serviceClass)) {
-				break
+				if (log.debugEnabled) {
+					log.debug "service '$serviceClass.name' does not define any wsclients"
+				}
+				continue
+			}
+
+			if (log.infoEnabled) {
+				log.info "configuring ws clients for '$serviceClass.name'"
 			}
 			
 			configureClientsForServiceClass(serviceClass, application, templateConfigFactory, templateBuilder, adapters)
@@ -65,4 +74,5 @@ class SpringwsClientGrailsPlugin {
 		adapter.buildWith(builder)
 	}
 	
+	private static final log = LoggerFactory.getLogger('grails.plugin.springwsclient.SpringwsClientGrailsPlugin')
 }
