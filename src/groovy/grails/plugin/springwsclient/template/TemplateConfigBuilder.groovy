@@ -30,7 +30,7 @@ class TemplateConfigBuilder {
 		$config.templateClass = clazz
 	}
 	
-	void mockClass(Class clazz) {
+	void mock(Class clazz) {
 		$config.mockClass = clazz
 	}
 	
