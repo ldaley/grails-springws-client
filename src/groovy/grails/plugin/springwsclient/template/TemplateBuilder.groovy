@@ -21,6 +21,8 @@ import grails.plugin.springwsclient.destination.ConstantDestinationProvider
 import grails.plugin.springwsclient.marshalling.MarkupBuilderMarshaller
 import grails.plugin.springwsclient.marshalling.XmlSlurperUnmarshaller
 
+import grails.plugin.springwsclient.interceptor.LoggingInterceptor
+
 class TemplateBuilder {
 
 	final beanBuilder
@@ -70,6 +72,24 @@ class TemplateBuilder {
 					unmarshaller = this.createDefaultUnmarshaller() 
 				}
 				
+				if (templateConfig.messageFactoryName) {
+					messageFactory = ref(templateConfig.messageFactoryName)
+				}
+				
+				def interceptors = []
+				
+				if (templateConfig.shouldLog) {
+					interceptors << new LoggingInterceptor(
+						templateConfig.logName, 
+						templateConfig.logRequests, 
+						templateConfig.logResponses, 
+						templateConfig.logFaults
+					)
+				}
+				
+				if (interceptors) {
+					delegate.interceptors = interceptors
+				}
 			}
 		}
 	}

@@ -25,6 +25,7 @@ class DoublingService {
 	def wsclients = {
 		doubling { 
 			mockClass MockDoublingHttpSoapService
+			log requests: true, responses: true
 		}
 	}
 

@@ -38,6 +38,18 @@ class TemplateConfigBuilder {
 		$config.interceptorNames = interceptorNames
 	}
 	
+	void messageFactory(String name) {
+		$config.messageFactoryName = name
+	}
+	
+	void log(Map switches) {
+		[requests: "logRequests", responses: "logResponses", faults: "logFaults"].each { k, v ->
+			if (switches[k]) {
+				$config."$v" = true
+			}
+		}
+	}
+	
 	static List<TemplateConfig> buildAll(grailsApplication, TemplateConfigFactory configFactory, Closure configs) {
 		extractDefinitions(configs).collect { name, definition ->
 			if (definition) {

@@ -31,6 +31,10 @@ class TemplateConfig implements Cloneable {
 	String destinationProviderName
 	Class mockClass
 	
+	boolean logRequests = false
+	boolean logResponses = false
+	boolean logFaults = false
+	
 	Map parameters
 	
 	String getBeanName() {
@@ -43,6 +47,14 @@ class TemplateConfig implements Cloneable {
 	
 	boolean isShouldCreateMock() {
 		parameters.mock == true
+	}
+	
+	boolean isShouldLog() {
+		logRequests || logResponses || logFaults
+	}
+	
+	String getLogName() {
+		"grails.plugin.springwsclient.client." + name
 	}
 	
 	URI getDestinationParameter() {
