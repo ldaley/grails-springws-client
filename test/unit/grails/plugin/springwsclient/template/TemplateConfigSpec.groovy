@@ -19,21 +19,11 @@ package grails.plugin.springwsclient.template
 import spock.lang.*
 import grails.plugin.spock.*
 
-class TemplateConfigSpec extends UnitSpec {
+class TemplateConfigSpec extends TemplateSpecUtils {
 
-	protected config(Map values) {
-		new TemplateConfig(values)
-	}
-
-	protected toConfigObject(Map params) {
-		def co = new ConfigObject()
-		co.putAll(params)
-		co
-	}
-	
 	def "should log or not"() {
 		expect:
-		config(logRequests: logRequests, logResponses: logResponses, logFaults: logFaults).shouldLog == should
+		templateConfig(logRequests: logRequests, logResponses: logResponses, logFaults: logFaults).shouldLog == should
 		
 		where:
 		logRequests | logResponses | logFaults | should
@@ -46,7 +36,7 @@ class TemplateConfigSpec extends UnitSpec {
 	
 	def "should validate or not"() {
 		expect:
-		config(
+		templateConfig(
 			parameters: toConfigObject(parameters), 
 			validateRequests: validateRequests, 
 			validateResponses: validateResponses,
@@ -69,8 +59,8 @@ class TemplateConfigSpec extends UnitSpec {
 	
 	def "should validate request and|or response"() {
 		expect:
-		config(parameters: toConfigObject(parameters), validateRequests: validateRequests,  validateResponses: validateResponses).validateRequests == shouldValidateRequest
-		config(parameters: toConfigObject(parameters), validateRequests: validateRequests,  validateResponses: validateResponses).validateResponses == shouldValidateResponse
+		templateConfig(parameters: toConfigObject(parameters), validateRequests: validateRequests,  validateResponses: validateResponses).validateRequests == shouldValidateRequest
+		templateConfig(parameters: toConfigObject(parameters), validateRequests: validateRequests,  validateResponses: validateResponses).validateResponses == shouldValidateResponse
 		
 		where:
 		validateRequests | validateResponses | parameters                                           | shouldValidateRequest | shouldValidateResponse
@@ -88,7 +78,7 @@ class TemplateConfigSpec extends UnitSpec {
 	
 	def "should create mock"() {
 		expect:
-		config(mockClass: mockClass, parameters: toConfigObject(mock: mock)).shouldCreateMock == should
+		templateConfig(mockClass: mockClass, parameters: toConfigObject(mock: mock)).shouldCreateMock == should
 		
 		where:
 		mockClass | mock  | should

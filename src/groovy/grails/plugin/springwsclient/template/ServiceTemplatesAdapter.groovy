@@ -16,19 +16,21 @@
 
 package grails.plugin.springwsclient.template
 
+import org.codehaus.groovy.grails.commons.GrailsApplication
+import org.codehaus.groovy.grails.commons.GrailsServiceClass
+
 class ServiceTemplatesAdapter {
 
 	static DEFINITIONS_PROPERTY = "wsclients"
 	
-	final grailsApplication
-	final serviceClass
-	final templateConfigs
+	final GrailsApplication grailsApplication
+	final GrailsServiceClass serviceClass
+	final List<TemplateConfig> templateConfigs
 	
-	ServiceTemplatesAdapter(serviceClass, grailsApplication, TemplateConfigFactory configFactory) {
+	ServiceTemplatesAdapter(GrailsServiceClass serviceClass, GrailsApplication grailsApplication, TemplateConfigFactory configFactory) {
 		this.serviceClass = serviceClass
 		this.grailsApplication = grailsApplication
-		
-		this.templateConfigs = createConfigs(configFactory)
+		this.templateConfigs = createConfigs(configFactory).asImmutable()
 	}
 	
 	protected createConfigs(TemplateConfigFactory configFactory) {
@@ -36,12 +38,10 @@ class ServiceTemplatesAdapter {
 	}
 	
 	void buildWith(TemplateBuilder builder) {
-		templateConfigs.each {
-			builder.build(it)
-		}
+		templateConfigs.each { builder.build(it) }
 	}
 	
-	static getDefinitions(serviceClass) {
+	static getDefinitions(GrailsServiceClass serviceClass) {
 		def definitions = serviceClass.getPropertyValue(DEFINITIONS_PROPERTY)
 		if (definitions instanceof Closure) {
 			definitions

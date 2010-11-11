@@ -21,7 +21,7 @@ import grails.plugin.spock.*
 
 import org.springframework.ws.WebServiceMessageFactory
 
-class TemplateConfigBuilderSpec extends UnitSpec {
+class TemplateConfigBuilderSpec extends TemplateSpecUtils {
 	
 	def grailsApplication = null
 	
@@ -29,24 +29,16 @@ class TemplateConfigBuilderSpec extends UnitSpec {
 	def configs
 	
 	protected build(Closure definition) {
-		config = TemplateConfigBuilder.build(grailsApplication, new TemplateConfig(), definition)
+		config = TemplateConfigBuilder.build(createApplication(), new TemplateConfig(), definition)
 	}
 	
 	protected buildAll(Closure definition) {
 		buildAll([:], definition)
 	}
 	
-	protected getConfigObject() {
-		new ConfigObject()
-	}
 	
 	protected buildAll(Map parameters, Closure definition) {
-		def grailsApplication = configObject
-		grailsApplication.config.springwsclient.putAll(parameters)
-		def parameterSource = new ApplicationConfigParameterSource(grailsApplication)
-		
-		def templateConfigFactory = new DefaultCloningTemplateConfigFactory(new TemplateConfig(), parameterSource)
-		
+		def templateConfigFactory = createTemplateConfigFactory(parameters)
 		configs = TemplateConfigBuilder.buildAll(grailsApplication, templateConfigFactory, definition)
 	}
 	
@@ -221,12 +213,8 @@ class TemplateConfigBuilderSpec extends UnitSpec {
 	}
 	
 	def "sourcing params"() {
-		given:
-		def config = getConfigObject() 
-		config.clients.c1.validate = true
-		
 		when:
-		buildAll(config) {
+		buildAll(createConfig { it.clients.c1.validate = true }) {
 			c1()
 		}
 		
