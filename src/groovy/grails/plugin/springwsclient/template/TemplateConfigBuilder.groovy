@@ -16,6 +16,8 @@
 
 package grails.plugin.springwsclient.template
 
+import org.springframework.ws.WebServiceMessageFactory
+
 class TemplateConfigBuilder {
 
 	private final $config
@@ -26,7 +28,7 @@ class TemplateConfigBuilder {
 		this.$config = config
 	}
 	
-	void templateClass(Class clazz) {
+	void template(Class clazz) {
 		$config.templateClass = clazz
 	}
 	
@@ -34,12 +36,16 @@ class TemplateConfigBuilder {
 		$config.mockClass = clazz
 	}
 	
-	void interceptorNames(String[] interceptorNames) {
-		$config.interceptorNames = interceptorNames
+	void interceptors(Object[] interceptors) {
+		$config.interceptors.addAll(interceptors)
 	}
 	
 	void messageFactory(String name) {
 		$config.messageFactoryName = name
+	}
+	
+	void messageFactory(WebServiceMessageFactory messageFactory) {
+		$config.messageFactory = messageFactory
 	}
 	
 	void schema(String[] schema) {
@@ -66,6 +72,16 @@ class TemplateConfigBuilder {
 				$config."$v" = true
 			}
 		}
+	}
+	
+	static public class InvalidWsClientDSLUsageException extends IllegalStateException {
+		InvalidWsClientDSLUsageException(String name, args) {
+			super("the wsclient DSL does not support the '$name' method with args ($args)".toString())
+		}
+	}
+	
+	def methodMissing(String name, args) {
+		throw new InvalidWsClientDSLUsageException(name, args)
 	}
 	
 	static List<TemplateConfig> buildAll(grailsApplication, TemplateConfigFactory configFactory, Closure configs) {

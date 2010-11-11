@@ -16,6 +16,8 @@
 
 package grails.plugin.springwsclient.template
 
+import org.springframework.ws.WebServiceMessageFactory
+
 class TemplateConfig implements Cloneable {
 	
 	static public final BEAN_NAME_SUFFIX = "WsClient"
@@ -23,9 +25,12 @@ class TemplateConfig implements Cloneable {
 	
 	String name
 	Class templateClass
-	String[] interceptorNames
+	List interceptors = []
 	String[] messageSenderNames
+	
 	String messageFactoryName
+	WebServiceMessageFactory messageFactory
+	
 	String marshallerName
 	String unmarshallerName
 	String destinationProviderName
@@ -51,7 +56,7 @@ class TemplateConfig implements Cloneable {
 	}
 	
 	boolean isShouldCreateMock() {
-		parameters.mock == true
+		parameters?.mock == true
 	}
 	
 	boolean isShouldLog() {
@@ -63,11 +68,11 @@ class TemplateConfig implements Cloneable {
 	}
 	
 	boolean isValidateRequests() {
-		this.validateRequests || (parameters.validateRequests == true || parameters.validate == true)
+		this.validateRequests || (parameters?.validateRequests == true || parameters?.validate == true)
 	}
 
 	boolean isValidateResponses() {
-		this.validateResponses || (parameters.validateResponses == true || parameters.validate == true)
+		this.validateResponses || (parameters?.validateResponses == true || parameters?.validate == true)
 	}
 	
 	String getLogName() {
@@ -76,7 +81,7 @@ class TemplateConfig implements Cloneable {
 	
 	URI getDestinationParameter() {
 		def uri = null
-		def destinationParameter = parameters.destination
+		def destinationParameter = parameters?.destination
 		if (destinationParameter instanceof String) {
 			uri = new URI(destinationParameter)
 		} else if (destinationParameter instanceof URI) {

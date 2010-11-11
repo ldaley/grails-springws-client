@@ -74,7 +74,9 @@ class TemplateBuilder {
 					unmarshaller = this.createDefaultUnmarshaller() 
 				}
 				
-				if (templateConfig.messageFactoryName) {
+				if (templateConfig.messageFactory) {
+					messageFactory = templateConfig.messageFactory
+				} else if (templateConfig.messageFactoryName) {
 					messageFactory = ref(templateConfig.messageFactoryName)
 				}
 				
