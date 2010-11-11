@@ -22,7 +22,7 @@ class ConstantDestinationProvider implements DestinationProvider {
 
 	final URI destination
 	
-	ConstantDestinationProvider(destination) {
+	ConstantDestinationProvider(URI destination) {
 		this.destination = destination
 	}
 

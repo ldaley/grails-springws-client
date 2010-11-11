@@ -14,10 +14,15 @@
  * limitations under the License.
  */
 
-package grails.plugin.springwsclient.marshalling
+package grails.plugin.springwsclient.util
 
 import groovy.xml.MarkupBuilder
 
+/**
+ * Utility to print part of an XmlSlurper tree.
+ * 
+ * Can be useful when debugging response handling code.
+ */
 class GPathResultDumper {
 
 	static dump(xml, out = System.out) {

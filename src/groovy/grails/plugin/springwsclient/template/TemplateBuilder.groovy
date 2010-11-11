@@ -25,15 +25,20 @@ import grails.plugin.springwsclient.interceptor.LoggingInterceptor
 import org.springframework.ws.client.support.interceptor.ClientInterceptor
 import org.springframework.ws.client.support.interceptor.PayloadValidatingInterceptor
 
+import grails.spring.BeanBuilder
+
+/**
+ * Responsible for registering the appropriate beans from a template config with a bean builder.
+ */
 class TemplateBuilder {
 
-	final beanBuilder
+	final BeanBuilder beanBuilder
 	
-	TemplateBuilder(beanBuilder) {
+	TemplateBuilder(BeanBuilder beanBuilder) {
 		this.beanBuilder = beanBuilder
 	}
 
-	void build(templateConfig) {
+	void build(TemplateConfig templateConfig) {
 		beanBuilder.with {
 			def destinationProvider = null
 			

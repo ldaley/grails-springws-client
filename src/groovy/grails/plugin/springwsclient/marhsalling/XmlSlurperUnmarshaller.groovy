@@ -18,9 +18,13 @@ package grails.plugin.springwsclient.marshalling
 
 import javax.xml.transform.Source
 import javax.xml.transform.TransformerFactory
+
 import org.springframework.oxm.Unmarshaller
 import org.springframework.xml.transform.StringResult
 
+/**
+ * An unmarshaller that returns XmlSlurper objects representing the message.
+ */
 class XmlSlurperUnmarshaller implements Unmarshaller {
 
 	private transformerFactory = TransformerFactory.newInstance()

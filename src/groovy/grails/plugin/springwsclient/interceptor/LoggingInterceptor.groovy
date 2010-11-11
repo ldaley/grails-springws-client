@@ -24,6 +24,10 @@ import groovy.xml.XmlUtil
 import groovy.xml.StreamingMarkupBuilder
 import org.slf4j.LoggerFactory
 
+/**
+ * A client interceptor that can be used to log the entire web service message selectively,
+ * for requests, responses and/or faults.
+ */
 class LoggingInterceptor implements ClientInterceptor {
 
 	protected final log

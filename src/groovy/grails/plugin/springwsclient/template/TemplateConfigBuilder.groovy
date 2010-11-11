@@ -18,6 +18,9 @@ package grails.plugin.springwsclient.template
 
 import org.springframework.ws.WebServiceMessageFactory
 
+/**
+ * The implementor of the wsclient DSL.
+ */
 class TemplateConfigBuilder {
 
 	private final $config

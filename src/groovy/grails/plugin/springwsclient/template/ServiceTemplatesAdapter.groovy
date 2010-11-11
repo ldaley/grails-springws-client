@@ -19,6 +19,9 @@ package grails.plugin.springwsclient.template
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.codehaus.groovy.grails.commons.GrailsServiceClass
 
+/**
+ * The link between a particular service class and the template configs it defines.
+ */
 class ServiceTemplatesAdapter {
 
 	static DEFINITIONS_PROPERTY = "wsclients"

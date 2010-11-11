@@ -19,6 +19,11 @@ package grails.plugin.springwsclient.marshalling
 import org.springframework.oxm.Marshaller
 import javax.xml.transform.Result
 
+/**
+ * An extension of the SpringWS Marshaller interface that adds the capability
+ * to work with builder style marshallers. The difference being that a "building marshaller"
+ * can be worked with, whereas a normal marshaller simply returns the marshalled result.
+ */
 interface BuildingMarshaller extends Marshaller {
 	
 	void withBuilder(Result result, Closure block)

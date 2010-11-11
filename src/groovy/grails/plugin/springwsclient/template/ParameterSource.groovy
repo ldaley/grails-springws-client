@@ -16,6 +16,10 @@
 
 package grails.plugin.springwsclient.template
 
+/**
+ * A parameter source fetches the parameters for a template config, which is
+ * a mechanism for influencing the config from outside of the DSL.
+ */
 interface ParameterSource {
 
 	Map getParametersForTemplate(String name)

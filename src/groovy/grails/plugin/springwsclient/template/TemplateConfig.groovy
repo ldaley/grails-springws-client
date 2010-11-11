@@ -18,6 +18,9 @@ package grails.plugin.springwsclient.template
 
 import org.springframework.ws.WebServiceMessageFactory
 
+/**
+ * Struct like object that describes how a template is to be configured.
+ */
 class TemplateConfig implements Cloneable {
 	
 	static public final BEAN_NAME_SUFFIX = "WsClient"

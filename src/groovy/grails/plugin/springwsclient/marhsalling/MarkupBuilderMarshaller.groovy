@@ -22,6 +22,9 @@ import org.springframework.xml.transform.StringSource
 
 import groovy.xml.MarkupBuilder
 
+/**
+ * A marshaller that works with closures to enable Groovy style message building.
+ */
 class MarkupBuilderMarshaller implements BuildingMarshaller {
 
 	private transformerFactory = TransformerFactory.newInstance()

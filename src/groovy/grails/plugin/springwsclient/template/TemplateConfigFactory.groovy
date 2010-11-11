@@ -16,6 +16,9 @@
 
 package grails.plugin.springwsclient.template
 
+/**
+ * A strategy interface for controlling the creation of new configs
+ */
 interface TemplateConfigFactory {
 
 	TemplateConfig createForName(String name)

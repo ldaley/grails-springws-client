@@ -16,6 +16,10 @@
 
 package grails.plugin.springwsclient.template
 
+/**
+ * A template config factory that creates templates by cloning a given default,
+ * and setting the parameters via a given parameter source.
+ */
 class DefaultCloningTemplateConfigFactory implements TemplateConfigFactory {
 
 	final TemplateConfig defaultConfig
