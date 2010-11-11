@@ -86,5 +86,16 @@ class TemplateConfigSpec extends UnitSpec {
 		false            | false             | [validate: true                                   ]  | true                  | true 
 	}
 	
+	def "should create mock"() {
+		expect:
+		config(mockClass: mockClass, parameters: toConfigObject(mock: mock)).shouldCreateMock == should
+		
+		where:
+		mockClass | mock  | should
+		null      | false | false
+		String    | false | false
+		null      | true  | true
+		String    | true  | true  
+	}
 	
 }
