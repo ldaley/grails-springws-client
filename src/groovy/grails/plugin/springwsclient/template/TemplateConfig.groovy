@@ -34,7 +34,7 @@ class TemplateConfig implements Cloneable {
 	
 	boolean validateRequests = false
 	boolean validateResponses = false
-	final List<String> schemaResources = []
+	List<String> schemaResources = []
 	
 	boolean logRequests = false
 	boolean logResponses = false
