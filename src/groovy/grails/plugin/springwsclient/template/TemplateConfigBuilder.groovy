@@ -56,6 +56,10 @@ class TemplateConfigBuilder {
 		$config.validateResponses = flags.responses == true
 	}
 	
+	void log(boolean flag) {
+		log(requests: flag, responses: flag, faults: flag)
+	}
+	
 	void log(Map switches) {
 		[requests: "logRequests", responses: "logResponses", faults: "logFaults"].each { k, v ->
 			if (switches[k]) {
