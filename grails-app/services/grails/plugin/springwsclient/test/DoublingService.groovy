@@ -26,10 +26,12 @@ class DoublingService {
 		doubling { 
 			mock MockDoublingHttpSoapService
 			log requests: true, responses: true
+			schema "classpath:schema/number.xsd"
+			validate true
 		}
 	}
 
 	def doubleIt(num) {
-		doublingWsClient.marshalSendAndReceive { number(num.toString()) }.text().toInteger()
+		doublingWsClient.marshalSendAndReceive { number(xmlns: "n", num.toString()) }.text().toInteger()
 	}
 }

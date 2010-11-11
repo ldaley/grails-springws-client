@@ -21,7 +21,7 @@ import grails.plugin.springwsclient.mock.http.MockHttpSoapService
 class MockDoublingHttpSoapService extends MockHttpSoapService {
 
 	def service(req, res) {
-		res.number(req.text().toInteger() * 2)
+		res.number(xmlns: "n", req.text().toInteger() * 2)
 	}
 
 }

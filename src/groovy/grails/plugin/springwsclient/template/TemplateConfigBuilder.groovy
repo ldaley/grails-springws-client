@@ -42,6 +42,20 @@ class TemplateConfigBuilder {
 		$config.messageFactoryName = name
 	}
 	
+	void schema(String[] schema) {
+		$config.schemaResources.addAll(schema.toList())
+	}
+	
+	void validate(boolean flag) {
+		$config.validateRequests = flag
+		$config.validateResponses = flag
+	}
+	
+	void validate(Map flags) {
+		$config.validateRequests = flags.requests == true
+		$config.validateResponses = flags.responses == true
+	}
+	
 	void log(Map switches) {
 		[requests: "logRequests", responses: "logResponses", faults: "logFaults"].each { k, v ->
 			if (switches[k]) {

@@ -29,7 +29,12 @@ class TemplateConfig implements Cloneable {
 	String marshallerName
 	String unmarshallerName
 	String destinationProviderName
+	
 	Class mockClass
+	
+	boolean validateRequests = false
+	boolean validateResponses = false
+	final List<String> schemaResources = []
 	
 	boolean logRequests = false
 	boolean logResponses = false
@@ -51,6 +56,18 @@ class TemplateConfig implements Cloneable {
 	
 	boolean isShouldLog() {
 		logRequests || logResponses || logFaults
+	}
+
+	boolean isShouldValidate() {
+		(this.isValidateRequests() || this.isValidateResponses()) && !schemaResources.empty 
+	}
+	
+	boolean isValidateRequests() {
+		this.validateRequests || (parameters.validateRequests == true || parameters.validate == true)
+	}
+
+	boolean isValidateResponses() {
+		this.validateResponses || (parameters.validateResponses == true || parameters.validate == true)
 	}
 	
 	String getLogName() {

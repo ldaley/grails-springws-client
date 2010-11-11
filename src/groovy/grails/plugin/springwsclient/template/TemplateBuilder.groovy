@@ -20,8 +20,10 @@ import grails.plugin.springwsclient.destination.ConstantDestinationProvider
 
 import grails.plugin.springwsclient.marshalling.MarkupBuilderMarshaller
 import grails.plugin.springwsclient.marshalling.XmlSlurperUnmarshaller
-
 import grails.plugin.springwsclient.interceptor.LoggingInterceptor
+
+import org.springframework.ws.client.support.interceptor.ClientInterceptor
+import org.springframework.ws.client.support.interceptor.PayloadValidatingInterceptor
 
 class TemplateBuilder {
 
@@ -78,6 +80,16 @@ class TemplateBuilder {
 				
 				def interceptors = []
 				
+				// If no schemas were defined, this will be an empty list
+				def schemas = templateConfig.schemaResources.collect { parentCtx.getResource(it) }
+
+				// interceptors are executed in reverse on responses, so validating responses before logging
+				// in the chain actually means that logging happens before validation on responses which is
+				// what we want here.
+				if (schemas && templateConfig.validateResponses) {
+					interceptors << this.createValidatingInterceptor(schemas, false, true)
+				}
+
 				if (templateConfig.shouldLog) {
 					interceptors << new LoggingInterceptor(
 						templateConfig.logName, 
@@ -86,12 +98,26 @@ class TemplateBuilder {
 						templateConfig.logFaults
 					)
 				}
+
+				// We want to validate after logging so we can see the message if need be
+				if (schemas && templateConfig.validateRequests) {
+					interceptors << this.createValidatingInterceptor(schemas, true, false)
+				}
 				
 				if (interceptors) {
-					delegate.interceptors = interceptors
+					delegate.interceptors = interceptors as ClientInterceptor[]
 				}
 			}
 		}
+	}
+	
+	protected createValidatingInterceptor(schemas, boolean forRequests, boolean forResponses) {
+		def interceptor = new PayloadValidatingInterceptor()
+		interceptor.schemas = schemas
+		interceptor.validateRequest = forRequests
+		interceptor.validateResponse = forResponses
+		interceptor.afterPropertiesSet()
+		interceptor
 	}
 	
 	protected createDefaultMarshaller() {
