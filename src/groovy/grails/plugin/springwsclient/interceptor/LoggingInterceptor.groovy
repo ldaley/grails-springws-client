@@ -20,7 +20,8 @@ import org.springframework.xml.transform.TransformerObjectSupport
 import org.springframework.ws.client.support.interceptor.ClientInterceptor
 import org.springframework.ws.WebServiceMessage
 import org.springframework.ws.context.MessageContext
-
+import groovy.xml.XmlUtil
+import groovy.xml.StreamingMarkupBuilder
 import org.slf4j.LoggerFactory
 
 class LoggingInterceptor implements ClientInterceptor {
@@ -78,6 +79,9 @@ class LoggingInterceptor implements ClientInterceptor {
 	protected messageAsString(WebServiceMessage message) {
 		def baos = new ByteArrayOutputStream()
 		message.writeTo(baos)
-		new String(baos.toByteArray())
+		def xml = new String(baos.toByteArray())
+		
+		def node = new XmlSlurper().parseText(xml)
+		XmlUtil.serialize(new StreamingMarkupBuilder().bind { mkp.yield(node) })
 	}
 }
