@@ -17,19 +17,6 @@
 package grails.plugin.springwsclient.template
 
 class ServiceTemplatesAdapterSpec extends TemplateSpecUtils {
-
-	protected create(wsclients) {
-		new ServiceTemplateAdapter(createServiceClassWithWsClients(wsclients), createApplication(), )
-	}
-	
-	protected createTemplateConfigFactory() {
-		def grailsApplication = 
-		grailsApplication.config.springwsclient.putAll(parameters)
-		def parameterSource = new ApplicationConfigParameterSource(grailsApplication)
-		
-		def templateConfigFactory = new DefaultCloningTemplateConfigFactory(new TemplateConfig(), parameterSource)
-		
-	}
 	
 	def "retrieve definitions"() {
 		when:
@@ -52,5 +39,30 @@ class ServiceTemplatesAdapterSpec extends TemplateSpecUtils {
 		ServiceTemplatesAdapter.getDefinitions(createServiceClassWithWsClients(null)) == null
 	}
 	
+	def "creating instance"() {
+		when:
+		def adapter = createAdapter {
+			c1()
+			c2()
+		}
+		
+		then:
+		adapter.templateConfigs*.name == ["c1", "c2"]
+	}
+
+	def "creating instance with params"() {
+		given:
+		def wsclients = {
+			c1()
+		}
+		
+		when:
+		def adapter = createAdapter(wsclients) {
+			it.clients.c1.validate = true
+		}
+
+		then:
+		adapter.templateConfigs*.validateRequests == [true]
+	}
 	
 }

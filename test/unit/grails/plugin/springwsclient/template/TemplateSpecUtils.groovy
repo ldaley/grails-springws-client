@@ -33,7 +33,11 @@ class TemplateSpecUtils extends UnitSpec {
 	}
 
 	protected createApplicationWithConfig(Closure definition) {
-		createApplication(getConfig: { it }.curry(createConfig(definition)))
+		def config = createConfig {
+			definition(it.springwsclient)
+		}
+		
+		createApplication(getConfig: { it }.curry(config))
 	}
 	
 	protected createConfig(Closure definition) {
@@ -55,10 +59,13 @@ class TemplateSpecUtils extends UnitSpec {
 		)
 	}
 
-	protected createTemplateConfigFactory(TemplateConfig templateConfig = new TemplateConfig(), Closure configSetup = {}) {
-		def grailsApplication = createApplicationWithConfig { configSetup(it.springwsclient) }
-		def parameterSource = new ApplicationConfigParameterSource(grailsApplication)
+	protected createTemplateConfigFactory(GrailsApplication application = createApplication(), TemplateConfig templateConfig = new TemplateConfig()) {
+		def parameterSource = new ApplicationConfigParameterSource(application)
 		def templateConfigFactory = new DefaultCloningTemplateConfigFactory(templateConfig, parameterSource)
+	}
+
+	protected createTemplateConfigFactory(TemplateConfig templateConfig, Closure configSetup = {}) {
+		createTemplateConfigFactory(createApplicationWithConfig(configSetup), templateConfig)
 	}
 
 	protected createTemplateConfigFactory(Closure configSetup) {
@@ -81,4 +88,16 @@ class TemplateSpecUtils extends UnitSpec {
 		co
 	}
 	
+	protected createAdapter(wsclients) {
+		createAdapter(wsclients, {})
+	}
+
+	protected createAdapter(wsclients, GrailsApplication application) {
+		new ServiceTemplatesAdapter(createServiceClassWithWsClients(wsclients), application, createTemplateConfigFactory(application))
+		
+	}
+	protected createAdapter(wsclients, config) {
+		createAdapter(wsclients, createApplicationWithConfig(config))
+	}
+
 }
