@@ -44,7 +44,7 @@ class LoggingInterceptor implements ClientInterceptor {
 		if (logFault) {
 			def response = messageContext.response
 			if (response) {
-				doLog("fault: ", response)
+				doLog("fault --\n", response)
 			}
 		}
 		true
@@ -54,7 +54,7 @@ class LoggingInterceptor implements ClientInterceptor {
 		if (logRequest) {
 			def request = messageContext.request
 			if (request) {
-				doLog("request: ", request)
+				doLog("request --\n", request)
 			}
 		}
 		true
@@ -64,7 +64,7 @@ class LoggingInterceptor implements ClientInterceptor {
 		if (logResponse) {
 			def response = messageContext.response
 			if (response) {
-				doLog("response: ", response)
+				doLog("response --\n", response)
 			}
 		}
 		true
@@ -80,7 +80,6 @@ class LoggingInterceptor implements ClientInterceptor {
 		def baos = new ByteArrayOutputStream()
 		message.writeTo(baos)
 		def xml = new String(baos.toByteArray())
-		
 		def node = new XmlSlurper().parseText(xml)
 		XmlUtil.serialize(new StreamingMarkupBuilder().bind { mkp.yield(node) })
 	}
