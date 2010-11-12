@@ -16,11 +16,11 @@
 
 package grails.plugin.springwsclient.test
 
-import grails.plugin.springwsclient.mock.http.MockHttpSoapService
+import grails.plugin.springwsclient.mock.http.HttpSoapWebServiceMock
 
-class MockDoublingHttpSoapService extends MockHttpSoapService {
+class DoublingWebServiceMock extends HttpSoapWebServiceMock {
 
-	def service(req, res) {
+	void service(req, res) {
 		res.number(xmlns: "n", req.text().toInteger() * 2)
 	}
 

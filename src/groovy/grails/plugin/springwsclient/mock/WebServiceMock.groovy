@@ -18,6 +18,7 @@ package grails.plugin.springwsclient.mock
 
 import org.springframework.ws.client.support.destination.DestinationProvider
 
-interface MockService extends DestinationProvider {
-	
-}
+/**
+ * Defines the standard contract for web service mocks.
+ */
+interface WebServiceMock extends DestinationProvider {}

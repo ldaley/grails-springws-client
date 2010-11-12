@@ -26,19 +26,48 @@ import org.mortbay.jetty.servlet.ServletHolder
 import org.springframework.beans.factory.InitializingBean
 import org.springframework.beans.factory.DisposableBean
 
-class MockHttpService implements InitializingBean, DisposableBean {
+import grails.plugin.springwsclient.mock.WebServiceMock
 
-	final protected Map<String,Map<String,Servlet>> contexts = [:]
+/**
+ * A lightweight http servlet server that always uses an ephemeral port.
+ * 
+ * This implementation does not support adding servlets after the server has been started.
+ * Subclasses should override the willStart() method and register servlets there.
+ */
+abstract class HttpWebServiceMock implements WebServiceMock, InitializingBean, DisposableBean {
 
-	protected server 
-	boolean started
+	final private Map<String,Map<String,Servlet>> contexts = [:]
+
+	protected Server server 
+	private boolean running
+	
+	boolean isRunning() {
+		this.running
+	}
 	
 	void afterPropertiesSet() {
 		start()
 	}
+
+	void destroy() {
+		stop()
+	}
+	
+	protected getDestinationURIPath() {
+		""
+	}
+	
+	URI getDestination() {
+		if (running) {
+			new URI("http://localhost:${getPort()}" + getDestinationURIPath())
+		} else {
+			null
+		}
+	}
 	
 	void start() {
-		if (!started) {
+		if (!running) {
+			willStart()
 			server = new Server(0)
 			contexts.each { path, servlets ->
 				def context = new Context(server, path)
@@ -48,39 +77,38 @@ class MockHttpService implements InitializingBean, DisposableBean {
 			}
 			
 			server.start()
-			started = true
+			running = true
 		}
 	}
 	
-	void destroy() {
-		stop()
-	}
 	
 	void stop() {
-		if (started) {
+		if (running) {
 			server.stop()
+			server = null
 			started = false
 		}
 	}
 	
+	/**
+	 * Will return null if the server 
+	 */
 	def getPort() {
 		server?.connectors[0].localPort
 	}
 	
-	void addServlet(servlet, context = "/", pathSpec = '/*') {
+	/**
+	 * Subclass hook to register servlets before the server starts
+	 */
+	protected willStart() {
+		
+	}
+	
+	/**
+	 * The mechanism for registering servlets
+	 */
+	protected void addServlet(servlet, context = "/", pathSpec = '/*') {
 		contexts[context] = [(pathSpec): servlet]
 	}
 	
-	void putAt(String context, Servlet servlet) {
-		addServlet(servlet, context)
-	}
-	
-	void putAt(List contextAndPathSpec, Servlet servlet) {
-		def (context, pathSpec) = contextAndPathSpec
-		addServlet(servlet, context, pathSpec)
-	}
-	
-	def leftShift(servlet) {
-		addServlet(servlet)
-	}
 }

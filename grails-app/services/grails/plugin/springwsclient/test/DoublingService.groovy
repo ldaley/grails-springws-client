@@ -24,7 +24,7 @@ class DoublingService {
 	
 	def wsclients = {
 		doubling { 
-			mock MockDoublingHttpSoapService
+			mock DoublingWebServiceMock
 			log true
 			schema "classpath:schema/number.xsd"
 			validate true
