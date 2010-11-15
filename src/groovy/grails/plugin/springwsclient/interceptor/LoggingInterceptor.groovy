@@ -83,8 +83,6 @@ class LoggingInterceptor implements ClientInterceptor {
 	protected messageAsString(WebServiceMessage message) {
 		def baos = new ByteArrayOutputStream()
 		message.writeTo(baos)
-		def xml = new String(baos.toByteArray())
-		def node = new XmlSlurper().parseText(xml)
-		XmlUtil.serialize(new StreamingMarkupBuilder().bind { mkp.yield(node) })
+		XmlUtil.serialize(new String(baos.toByteArray()))
 	}
 }
