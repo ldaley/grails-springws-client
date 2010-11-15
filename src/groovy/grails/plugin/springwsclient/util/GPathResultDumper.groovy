@@ -16,38 +16,29 @@
 
 package grails.plugin.springwsclient.util
 
-import groovy.xml.MarkupBuilder
+import groovy.util.slurpersupport.GPathResult
+import groovy.xml.XmlUtil
 
 /**
- * Utility to print part of an XmlSlurper tree.
+ * Utility to pretty print part of an XmlSlurper tree.
  * 
  * Can be useful when debugging response handling code.
  */
 class GPathResultDumper {
 
-	static dump(xml, out = System.out) {
-		def builder = new MarkupBuilder(new OutputStreamWriter(out))
-		
-		def traverse
-		traverse = { node ->
-			def children = {
-				node.children().each {
-					traverse(it)
-				}
-			}
-				
-			if (node.text() && node.attributes()) {
-				builder."${node.name()}"(node.attributes(), node.text(), children) 
-			} else if (node.text()) {
-				builder."${node.name()}"(node.text(), children) 
-			} else if (node.attributes()) {
-				builder."${node.name()}"(node.attributes(), children) 
-			} else {
-				builder."${node.name()}"(children) 
-			}
-		}
-		
-		traverse(xml)
+	static dump(GPathResult node, OutputStream out = System.out) {
+		dump(node, new OutputStreamWriter(out))
+		out
+	}
+	
+	static dump(GPathResult node, Writer writer) {
+		def printer = new XmlNodePrinter(new PrintWriter(writer))
+		printer.preserveWhitespace = true
+		printer.print(new XmlParser().parseText(XmlUtil.serialize(node)))
+		writer
 	}
 
+	static dumpAsString(GPathResult node) {
+		dump(node, new StringWriter()).toString()
+	}
 }

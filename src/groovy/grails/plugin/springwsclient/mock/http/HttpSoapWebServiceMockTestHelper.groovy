@@ -28,6 +28,9 @@ import org.springframework.xml.transform.StringResult
 import grails.plugin.springwsclient.marshalling.BuildingMarshaller
 import grails.plugin.springwsclient.marshalling.MarkupBuilderMarshaller
 import grails.plugin.springwsclient.marshalling.XmlSlurperUnmarshaller
+import groovy.xml.XmlUtil
+
+import groovy.util.slurpersupport.GPathResult
 
 /**
  * Designed to be used in testing web service mock implementations.
@@ -111,5 +114,9 @@ class HttpSoapWebServiceMockTestHelper {
 		if (!mock.running) {
 			throw new IllegalStateException("the web service mock '$mock' is not running")
 		}
+	}
+	
+	void dump(GPathResult xml, out = System.out) {
+		XmlUtil.serialize(xml, out)
 	}
 }

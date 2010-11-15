@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *	   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -24,6 +24,9 @@ import groovy.xml.XmlUtil
 import groovy.xml.StreamingMarkupBuilder
 import org.slf4j.LoggerFactory
 
+import javax.xml.parsers.DocumentBuilder
+import javax.xml.parsers.DocumentBuilderFactory
+
 /**
  * A client interceptor that can be used to log the entire web service message selectively,
  * for requests, responses and/or faults.
@@ -36,14 +39,22 @@ class LoggingInterceptor implements ClientInterceptor {
 	final boolean logResponse
 	final boolean logFault
 	
-	LoggingInterceptor(String logName, boolean logRequest, boolean logResponse, boolean logFault) {
+	protected final DocumentBuilder documentBuilder
+	
+	LoggingInterceptor(String logName, boolean logRequest, boolean logResponse, boolean logFault, DocumentBuilder documentBuilder = null) {
 		this.log = LoggerFactory.getLogger(logName)
 		
 		this.logRequest = logRequest
 		this.logResponse = logResponse
 		this.logFault = logFault
+		
+		this.documentBuilder = documentBuilder ?: createDocumentBuilder()
 	}
 
+	protected DocumentBuilder createDocumentBuilder() {
+		DocumentBuilderFactory.newInstance().newDocumentBuilder()
+	}
+	
 	boolean handleFault(MessageContext messageContext) {
 		if (logFault) {
 			def response = messageContext.response
@@ -83,6 +94,13 @@ class LoggingInterceptor implements ClientInterceptor {
 	protected messageAsString(WebServiceMessage message) {
 		def baos = new ByteArrayOutputStream()
 		message.writeTo(baos)
-		XmlUtil.serialize(new String(baos.toByteArray()))
+		
+		def stringWriter = new StringWriter()
+		def node = new XmlParser().parseText(new String(baos.toByteArray()))
+		def printer = new XmlNodePrinter(new PrintWriter(stringWriter))
+		printer.preserveWhitespace = true
+		printer.print(node)
+
+		stringWriter.toString()
 	}
 }
