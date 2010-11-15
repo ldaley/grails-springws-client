@@ -86,7 +86,7 @@ abstract class HttpWebServiceMock implements WebServiceMock, InitializingBean, D
 		if (running) {
 			server.stop()
 			server = null
-			started = false
+			running = false
 		}
 	}
 	
