@@ -41,7 +41,9 @@ import grails.plugin.springwsclient.marshalling.BuildingMarshaller
 import grails.plugin.springwsclient.marshalling.MarkupBuilderMarshaller
 import grails.plugin.springwsclient.marshalling.XmlSlurperUnmarshaller
 
-import groovy.xml.XmlUtil
+import groovy.util.slurpersupport.GPathResult
+import grails.plugin.springwsclient.util.GPathResultDumper
+
 
 /**
  * A base class for creating web service mocks for SOAP over HTTP web services.
@@ -130,8 +132,8 @@ abstract class HttpSoapWebServiceMock extends HttpWebServiceMock implements Payl
 	/**
 	 * Utility to aid in debugging.
 	 */
-	protected dump(xml, out = System.out) {
-		XmlUtil.serialize(xml, out)
+	void dump(GPathResult xml, out = System.out) {
+		GPathResultDumper.dump(xml, out)
 	}
 	
 	/**

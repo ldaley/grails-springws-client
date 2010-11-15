@@ -31,6 +31,7 @@ import grails.plugin.springwsclient.marshalling.XmlSlurperUnmarshaller
 import groovy.xml.XmlUtil
 
 import groovy.util.slurpersupport.GPathResult
+import grails.plugin.springwsclient.util.GPathResultDumper
 
 /**
  * Designed to be used in testing web service mock implementations.
@@ -117,6 +118,6 @@ class HttpSoapWebServiceMockTestHelper {
 	}
 	
 	void dump(GPathResult xml, out = System.out) {
-		XmlUtil.serialize(xml, out)
+		GPathResultDumper.dump(xml, out)
 	}
 }
