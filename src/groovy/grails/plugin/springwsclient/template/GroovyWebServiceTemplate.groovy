@@ -22,6 +22,8 @@ import org.springframework.ws.client.core.WebServiceMessageCallback
 import org.springframework.ws.soap.client.core.SoapActionCallback
 import org.springframework.ws.WebServiceMessage
 
+import grails.plugin.springwsclient.marshalling.MarkupBuilderMarshaller
+
 class GroovyWebServiceTemplate extends WebServiceTemplate {
 
 	static private class ClosureWebServiceMessageCallback {
@@ -66,5 +68,28 @@ class GroovyWebServiceTemplate extends WebServiceTemplate {
 	
 	def call(String action, Closure payload) {
 		marshalSendAndReceive(payload, actionCallback(action))
+	}
+	
+	def call(WebServiceMessageCallback callback, payload) {
+		marshalSendAndReceive(payload, callback)
+	}
+	
+	def header(Closure block) {
+		new HeaderBuildingCallback(block)
+	}
+	
+	static private class HeaderBuildingCallback implements WebServiceMessageCallback {
+		private Closure definition
+		
+		HeaderBuildingCallback(Closure definition) {
+			this.definition = definition
+		}
+		
+		void doWithMessage(WebServiceMessage message) {
+			new MarkupBuilderMarshaller().withBuilder(message.soapHeader.result) {
+				definition.delegate = it
+				definition.call()
+			}
+		}
 	}
 }

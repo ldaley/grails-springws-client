@@ -87,6 +87,10 @@ abstract class HttpSoapWebServiceMock extends HttpWebServiceMock implements Payl
 		throw new UnsupportedOperationException("this implementation does not support this method")
 	}
 	
+	void serviceHeader(header) {
+		
+	}
+	
 	protected willStart() {
 		addServlet(createServlet())
 	}
@@ -179,6 +183,9 @@ abstract class HttpSoapWebServiceMock extends HttpWebServiceMock implements Payl
 	 * 
 	 */
 	protected receive(MessageContext messageContext) {
+		def requestHeader = messageContext.request.soapHeader
+		serviceHeader(unmarshaller.unmarshal(requestHeader.source))
+		
 		adapter.invoke(messageContext, this)
 	}
 
