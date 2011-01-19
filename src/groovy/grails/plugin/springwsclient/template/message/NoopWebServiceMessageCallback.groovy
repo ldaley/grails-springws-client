@@ -13,29 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package grails.plugin.springwsclient.test
 
-/**
- * Simple test service used in the smoke test.
- */
-class DoublingService {
+package grails.plugin.springwsclient.template.message
 
-	static transactional = false
-	
-	def wsclients = {
-		doubling { 
-			mock DoublingWebServiceMock
-			log true
-			schema "classpath:schema/number.xsd"
-			validate true
-		}
-	}
+import org.springframework.ws.WebServiceMessage
+import org.springframework.ws.client.core.WebServiceMessageCallback
 
-	def doubleIt(num) {
-		doublingWsClient.send { 
-			body {
-				number(xmlns: "n", num.toString())
-			}
-		}.text().toInteger()
-	}
+class NoopWebServiceMessageCallback  implements WebServiceMessageCallback {
+	void doWithMessage(WebServiceMessage message) {}
 }
