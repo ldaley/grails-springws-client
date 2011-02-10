@@ -45,7 +45,7 @@ class SoapMessage {
 		}
 
 		void action(String action) {
-			callback(new SoapActionCallback(actionName))
+			callback(new SoapActionCallback(action))
 		}
 		
 		void header(Closure definition) {
