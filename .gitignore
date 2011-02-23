@@ -2,4 +2,7 @@ target
 *.xml
 *.log
 *.zip
-.DS_Store
+.DS_Store.gradle
+.idae
+grails-springws-client-grailsPlugins.iml
+grails-springws-client.iml
