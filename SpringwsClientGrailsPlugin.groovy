@@ -20,7 +20,7 @@ import org.slf4j.LoggerFactory
 
 class SpringwsClientGrailsPlugin {
 	def title = "SpringWS Client"
-	def version = "0.1"
+	def version = "0.2-SNAPSHOT"
 	def description = 'Integrates the client side aspects of the SpringWS library'
 	def author = "Luke Daley"
 	def authorEmail = "ld@ldaley.com"

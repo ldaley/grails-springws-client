@@ -17,79 +17,19 @@
 package grails.plugin.springwsclient.template
 
 import org.springframework.ws.client.core.WebServiceTemplate
-
-import org.springframework.ws.client.core.WebServiceMessageCallback
-import org.springframework.ws.soap.client.core.SoapActionCallback
-import org.springframework.ws.WebServiceMessage
-
-import grails.plugin.springwsclient.marshalling.MarkupBuilderMarshaller
+import grails.plugin.springwsclient.template.message.SoapMessage
 
 class GroovyWebServiceTemplate extends WebServiceTemplate {
 
-	static private class ClosureWebServiceMessageCallback {
-		final private callback
-
-		ClosureWebServiceMessageCallback(Closure callback) {
-			this.callback = callback
-		}
+	def send(Closure definition) {
+		def message = new SoapMessage()
+		message.build(definition)
 		
-		void doWithMessage(WebServiceMessage message) {
-			callback(message)
+		if (message.uri) {
+			marshalSendAndReceive(message.uri, message.body, message.callback)
+		} else {
+			marshalSendAndReceive(message.body, message.callback)
 		}
 	}
 	
-	WebServiceMessageCallback callback(Closure callback) {
-		new ClosureWebServiceMessageCallback(callback)
-	}
-
-	SoapActionCallback actionCallback(String actionName) {
-		new SoapActionCallback(actionName)
-	}
-	
-	def call(Object payload) {
-		marshalSendAndReceive(payload)
-	}
-	
-	def call(Object payload, String action) {
-		marshalSendAndReceive(payload, actionCallback(action))
-	}
-	
-	def call(Object payload, Closure callbackImpl) {
-		marshalSendAndReceive(payload, callback(callbackImpl))
-	}
-	
-	def call(Object payload, String action, Closure callbackImpl) {
-		def compositeCallback = {
-			actionCallback(it)
-			callbackImpl(it)
-		}
-		marshalSendAndReceive(payload, callback(compositeCallback))
-	}
-	
-	def call(String action, Closure payload) {
-		marshalSendAndReceive(payload, actionCallback(action))
-	}
-	
-	def call(WebServiceMessageCallback callback, payload) {
-		marshalSendAndReceive(payload, callback)
-	}
-	
-	def header(Closure block) {
-		new HeaderBuildingCallback(block)
-	}
-	
-	static private class HeaderBuildingCallback implements WebServiceMessageCallback {
-		private Closure definition
-		
-		HeaderBuildingCallback(Closure definition) {
-			this.definition = definition
-		}
-		
-		void doWithMessage(WebServiceMessage message) {
-			new MarkupBuilderMarshaller().withBuilder(message.soapHeader.result) {
-				definition.delegate = it
-				definition.call()
-			}
-		}
-	}
 }

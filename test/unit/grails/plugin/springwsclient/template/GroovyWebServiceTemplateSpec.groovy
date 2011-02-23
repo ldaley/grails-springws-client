@@ -70,17 +70,15 @@ class GroovyWebServiceTemplateSpec extends UnitSpec {
 			usernameValue = it.username.text()
 		}
 		
-		def header = template.header {
-			username("me")
-		}
-		
 		when:
-		template.call(header) { abc("123") }
+		template.send {
+			header { username("me") }
+			body { abc("123") }
+		}
 		
 		then:
 		usernameValue == "me"
 	}
-	
 	
 	def cleanup() {
 		mock.stop()
