@@ -1,6 +1,6 @@
 The plugin works by scanning your _services_ and identifying which ones declare a @ wsclients @ _closure_.
 
-When you are defining a @ wsclients @ you are _declaring_ a set of remote _WS_ _endpoints_ that you want to access inside such _service_. Through the @ wsclients @ _DSL_, syntax explained bellow, the plugin will identify the _endpoints_, build _adapters_/_clients_ and inject them to your _service_ with a specific naming convention that will use the name of the _endpoint_ as prefix and the *WsClient* qualifier as suffix.
+When you are defining your @ wsclients @ you are _declaring_ a set of remote _WS_ _endpoints_ that you want to access inside such _service_. Through the @ wsclients @ _DSL_, syntax explained bellow, the plugin will identify the _endpoints_, build _adapters_/_clients_ and inject them to your _service_ with a specific naming convention that will use the name of the _endpoint_ as prefix and the *WsClient* qualifier as suffix (e.g. @ remoteEndpoint @*WsClient* ). 
 
 h4. The Config.groovy file
 
@@ -9,7 +9,7 @@ Some description
 {code}
 springwsclient {
 	clients {
-		givenRemoteEndpoint {
+		remoteEndpoint {
             destination="http://my.server/services/soap/remote.endpoint"
 			//mock = true
 		}
@@ -19,32 +19,13 @@ springwsclient {
 
 h4. The WS Clients (wsclients) DSL
 
-Before we start its important to mention that the value assigned to the @ wsclients @ must be a @ Closure @ or a *method* with no arguments.
+Before we start its important to mention that the value assigned to the @ wsclients @ must be a @ Closure @ or a _method_ with no arguments.
 The @ Closure @ defines _N_ remote _endpoints_ and each _endpoint_ might specify the following:
-
-{code}
-def wsclients = {
-    //endpoint showing all elements of the elements you can specify 
-	givenRemoteEndpoint { 
-        template templateClass
-		mock mockClass
-        interceptors [ interceptor1, interceptor2 ]  
-        messageFactory 'nameOfMessageFactory' // Or  messageFactoryClass
-        schema [ "classpath:schema/a.xsd", "classpath:schema/b.xsd" ] 
-        validate true  // Or a map of flags 
-        log true // Or a map of switches 
-        schema true
-		log true
-	}
-}
-{code}
 
 h5.  template(Class clazz)
 
 
-
 h5.  mock(Class clazz) 
-
 
 
 h5.  interceptors(Object[] interceptors) 
@@ -77,6 +58,34 @@ h5.  log(boolean flag)
 
 h5.  log(Map switches)
 
+h5. Simple Sample
+{code}
+def wsclients = {
+    //endpoint showing all elements of the elements you can specify 
+	remoteEndpoint { 
+			mock RemoteEndpointMock //you will have to provide the impl. of the Mock. We recommended you do it.
+			log true
+			validate true
+		}
+   	}
+}
+{code}
+
+h5. Extended Sample
+{code}
+def wsclients = {
+    //endpoint showing all elements of the elements you can specify 
+	remoteEndpoint { 
+        template TheTemplateClass
+		mock RemoteEnpointMock
+        interceptors [ interceptor1, interceptor2 ]  
+        messageFactory 'nameOfMessageFactory' // Or  YourMessageFactoryClass
+        schema [ "classpath:schema/aschema.xsd", "classpath:schema/another.xsd" ] 
+        validate true  // Or a map of flags 
+        log true // Or a map of switches 
+	}
+}
+{code}
 
 h4. Endpoint Adapters 
 
