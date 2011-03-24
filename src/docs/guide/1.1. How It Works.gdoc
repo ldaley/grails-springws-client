@@ -1,0 +1,99 @@
+The plugin works by scanning your _services_ and identifying which ones declare a @ wsclients @ _closure_.
+
+When you are defining a @ wsclients @ you are _declaring_ a set of remote _WS_ _endpoints_ that you want to access inside such _service_. Through the @ wsclients @ _DSL_, syntax explained bellow, the plugin will identify the _endpoints_, build _adapters_/_clients_ and inject them to your _service_ with a specific naming convention that will use the name of the _endpoint_ as prefix and the *WsClient* qualifier as suffix.
+
+h4. The Config.groovy file
+
+Some description
+
+{code}
+springwsclient {
+	clients {
+		givenRemoteEndpoint {
+            destination="http://my.server/services/soap/remote.endpoint"
+			//mock = true
+		}
+	}
+}
+{code}
+
+h4. The WS Clients (wsclients) DSL
+
+Before we start its important to mention that the value assigned to the @ wsclients @ must be a @ Closure @ or a *method* with no arguments.
+The @ Closure @ defines _N_ remote _endpoints_ and each _endpoint_ might specify the following:
+
+{code}
+def wsclients = {
+    //endpoint showing all elements of the elements you can specify 
+	givenRemoteEndpoint { 
+        template templateClass
+		mock mockClass
+        interceptors [ interceptor1, interceptor2 ]  
+        messageFactory 'nameOfMessageFactory' // Or  messageFactoryClass
+        schema [ "classpath:schema/a.xsd", "classpath:schema/b.xsd" ] 
+        validate true  // Or a map of flags 
+        log true // Or a map of switches 
+        schema true
+		log true
+	}
+}
+{code}
+
+h5.  template(Class clazz)
+
+
+
+h5.  mock(Class clazz) 
+
+
+
+h5.  interceptors(Object[] interceptors) 
+
+
+
+h5.  messageFactory(String name) 
+
+
+
+h5.  messageFactory(WebServiceMessageFactory messageFactory) 
+
+
+
+h5.  schema(String[] schema) 
+
+
+
+h5.  validate(boolean flag) 
+
+
+
+h5.  validate(Map flags) 
+
+
+
+h5.  log(boolean flag) 
+
+
+
+h5.  log(Map switches)
+
+
+h4. Endpoint Adapters 
+
+Per each *service* containing a @ wsclients @ the *plugin* will create an *adapter*. Each *adapter* stores a reference to the *Grails Application*, the *Service Class* and immutable instance of a  *WS Client Configuration Template*.
+
+h4. The templateConfigFactory
+
+h4. The templateBuilder
+
+h4. The ServiceTemplatesAdapter
+
+h4. The Template Builder
+
+h5. Creating Mocks or Destinations
+
+Defined either a *mock* class that should be instantiated or the *remote destination* ( e.i. *URI* ) that provides the WS.
+
+h5. Bean creation
+
+A template of type @ GroovyWebServiceTemplate @

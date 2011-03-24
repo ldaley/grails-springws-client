@@ -1,0 +1,89 @@
+This plugin simplifies the implementation of *SOAP* *WebService* clients.
+
+h3. Example
+
+The following is a simple example to give you a feel for the plugin.
+
+h4. Service 
+
+Given a remote *SOAP Endpoint* we want to connect to, in this case located at @ http://my.server/services/soap/doubling @, we define a local
+*service*, depicted as @ DoublingService @, that will stub such endpoint for our purposes.
+
+h5. Configuration (Config.groovy)
+
+@ grails-app/conf/Config.groovy @
+{code}
+springwsclient {
+	clients {
+		doubling {
+            destination="http://my.server/services/soap/doubling"
+		}
+	}
+}
+{code}
+
+h5. The Service (DoublingService.groovy)
+
+@ grails-app/services/grails/plugin/springwsclient/test/DoublingService.groovy @
+{code}
+class DoublingService {
+
+	static transactional = false
+
+	def wsclients = {
+		doubling {
+			log true
+			schema "classpath:schema/number.xsd"
+			validate true
+		}
+	}
+
+	def doubleIt(num) {
+		doublingWsClient.send {
+			body {
+				number(xmlns: "n", num.toString())
+			}
+		}.text().toInteger()
+	}
+}
+{code}
+
+h4. The Service wsclients attribute
+
+The @ wsclients @ will let the *plugin* know that the *service* defines one or more *Web Service* clients. The *DSL* in the @ wsclients @ closure is used to define and configure *endpoint* clients which are able to send requests and receive synchronously. 
+
+h4. The adapters 
+
+Per each *service* containing a @ wsclients @ the *plugin* will create an *adapter*. Each *adapter* stores a reference to the *Grails Application*, the *Service Class* and immutable instance of a  *WS Client Configuration Template*.
+
+h4. The templateConfigFactory
+
+h4. The templateBuilder
+
+h4. The ServiceTemplatesAdapter
+
+h4. The WS Clients (wsclients) DSL
+
+Before we start its important to mention that the value assigned to the @ wsclients @ must be a @ Closure @ or a *method* with no arguments.
+The @ Closure @ defines **N** remote *endpoints* and each *endpoint* might specify the following:
+
+template(Class clazz)
+mock(Class clazz) 
+interceptors(Object[] interceptors) 
+messageFactory(String name) 
+messageFactory(WebServiceMessageFactory messageFactory) 
+schema(String[] schema) 
+validate(boolean flag) 
+validate(Map flags) 
+log(boolean flag) 
+log(Map switches) 
+
+h4. The Template Builder
+
+h5. Creating Mocks or Destinations
+
+Defined either a *mock* class that should be instantiated or the *remote destination* ( e.i. *URI* ) that provides the WS.
+
+h5. Bean creation
+
+A template of type @ GroovyWebServiceTemplate @
