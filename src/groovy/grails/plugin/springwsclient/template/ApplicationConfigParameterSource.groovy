@@ -19,7 +19,7 @@ package grails.plugin.springwsclient.template
 import org.codehaus.groovy.grails.commons.GrailsApplication
 
 /**
- * A parameter source that gets the parameters fromt the application config, 
+ * A parameter source that gets the parameters from the application config,
  * under 'springwsclient.clients.«client name»'.
  */
 class ApplicationConfigParameterSource implements ParameterSource {
