@@ -32,3 +32,18 @@ springwsclient {
 		}
 	}
 }
+
+grails {
+    doc {
+        title = "Grails Spring WS Client Plugin"
+        subtitle = "Spring WS Client for Grails"
+        authors = "Luke Daily"
+        copyright = "Copies of this document may be made for your own use and for distribution to others, provided that you do not charge any fee for such copies and further provided that each copy contains this Copyright Notice, whether distributed in print or electronically."
+        footer = "Developed by the <a href='http://alkemist.github.com'>Luke Daily</a>"
+        license = "Apache License 2.0"
+        api {
+            org.springframework.ws.client="http://static.springsource.org/spring-ws/site/apidocs"
+        }
+    }
+
+}

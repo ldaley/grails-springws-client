@@ -1,0 +1,246 @@
+This plugin is built on top of "Spring's WS* client support":http://static.springsource.org/spring-ws/site/reference/html/client.html" and works by scanning your _services_ and identifying which ones declare a @wsclients@ _closure_.
+
+When you are defining your @wsclients@ you are _declaring_ a set of remote _WS_ _endpoints_ that you want to access inside such _service_. Through the @wsclients@ _DSL_, syntax explained bellow, the plugin will identify each _endpoint_, build a _client_ and inject it to your _service_. You can reference the _client_ in your service using as prefix the name of the _endpoint_, as declared in the _DSL_, and *WsClient* as the suffix (e.g. @remoteEndpointWsClient@). 
+
+
+There are some core Spring *WS Client* concepts that you should at least be aware of.
+
+h3. The Template
+The plugin by default will use @GroovyWebServiceTemplate@ which extends from [WebServiceTemplate|api:org.springframework.ws.client.core.WebServiceTemplate] and is based on its defaults.  The @WebServiceTemplate@ provides the mechanism to *marshal*, *send*, and *receive* the requests.
+
+
+h3. Transport through the WebServiceMessageSenders
+
+The transport of the actual message is provided by instances of the @WebServiceMessageSender@ interface. As mentioned in the documentation there are two main implementations for HTTP. The default implementation is the @HttpUrlConnectionMessageSender@, which uses the facilities provided by Java itself. The alternative is the @CommonsHttpMessageSender@, which uses the Jakarta Commons @HttpClient@. You should "_use the latter if you need more advanced and easy-to-use functionality (such as authentication, HTTP connection pooling, and so forth)_":http://static.springsource.org/spring-ws/site/reference/html/client.html.
+
+Available _Message Senders_
+
+* "CommonsHttpMessageSender":http://static.springsource.org/spring-ws/site/apidocs/org/springframework/ws/transport/http/CommonsHttpMessageSender.html
+* "HttpUrlConnectionMessageSender":http://static.springsource.org/spring-ws/site/apidocs/org/springframework/ws/transport/http/HttpUrlConnectionMessageSender.html
+* "HttpsUrlConnectionMessageSender":http://static.springsource.org/spring-ws/site/apidocs/org/springframework/ws/transport/http/HttpsUrlConnectionMessageSender.html
+* "JmsMessageSender":http://static.springsource.org/spring-ws/site/apidocs/org/springframework/ws/transport/jms/JmsMessageSender.html
+* "XmppMessageSender":http://static.springsource.org/spring-ws/site/apidocs/org/springframework/ws/transport/xmpp/XmppMessageSender.html
+
+h3. Interceptors
+
+
+h3. Callbacks
+
+
+h3. Message Factory and Message Context
+
+
+org.springframework.ws.client.core.WebServiceTemplate
+org.springframework.ws.client.core.WebServiceMessageCallback
+org.springframework.ws.soap.client.core.SoapActionCallback
+org.springframework.ws.client.support.interceptor.ClientInterceptor
+org.springframework.ws.WebServiceMessageFactory
+org.springframework.ws.soap.SoapMessageFactory
+org.springframework.ws.soap.saaj.SaajSoapMessageFactory
+org.springframework.ws.context.DefaultMessageContext
+org.springframework.ws.context.MessageContext
+
+
+h3. The Config.groovy file
+
+The configuraion of this plugin should be located in the @springwsclient.clients@ namespace, as display bellow.
+
+{code}
+springwsclient {
+	clients {
+        remoteEndpoint {
+            // The remote destination you want to connect to
+            destination = "http://my.server/services/soap/remote.endpoint"
+            
+            // To enable mocking. ( you will have to provide a mock in the wsclients DSL )
+            //mock = true 
+            
+            //to validate requests and responses you can set
+            validate = true 
+            // If you want to set the validation flag in a more granular way you can  use
+            // validateRequests = true
+            // or
+            // validateResponses = true
+
+        }
+	}
+}
+{code}
+
+h4. Destination
+
+Either an instance of a @URI@ or a @String@ representing a valid @URI@ that points to the remote _endpoint_.
+
+h4. Mock
+
+If set to @true@ it will enable the usage of the _mock_ service instead of the _destination_. Review the @wsclients@ @mock@ definition to see how you can provide such _mock_.
+
+h4. Validate, Validate Requests and Validate Response
+
+You can enable the validation of the _requests_ and  _responses_ by setting @validate@ to @true@ or if you want a fine-grained approach you can specify @validateRequests@ and/or @validateResponses@.
+
+h3. The WS Clients (wsclients) DSL
+
+Before we start its important to mention that the value assigned to the @wsclients@ must be a @Closure@ or a _method_ with no arguments.
+The @Closure@ defines _N_ remote _endpoints_ and each _endpoint_ might specify the following:
+
+_Simple_
+{code}
+def wsclients = {
+	remoteEndpoint { 
+            mock RemoteEndpointMockClass //you will have to provide the implementation of the Mock. see bellow.
+            log true
+		}
+   	}
+}
+{code}
+
+_Extended_
+{code}
+def wsclients = {
+	remoteEndpoint { 
+        template TheTemplateClass
+        mock RemoteEnpointMockClass
+        interceptors [ interceptor1, interceptor2 ]  
+        marshallerName 'nameOfMarshaller'
+        unmarshallerName 'nameOfUnmarshaller'
+        messageFactoryName 'nameOfMessageFactory' 
+        schema [ "classpath:schema/number.xsd","/usr/local/share/xsds/checkout.xsd"]
+        validate true  // Or a map of flags 
+        log true // Or a map of switches 
+	}
+}
+{code}
+
+h4.  template:Class 
+
+By default the plugin will use a [GroovyWebServiceTemplate|api:grails.plugin.springwsclient.template.GroovyWebServiceTemplate] but you can define your own template by providing a _class_ that extends from [WebServiceTemplate|api:org.springframework.ws.client.core.WebServiceTemplate].
+
+h4.  mock:Class
+
+Defined the @Class@ that will be used to instantiate a _mock_ of the remote _endpoint_ if the @mock@ attribute is set to @true@ in the configuration of such endpoint inside the @Config.groovy@ file or any externalized configuration file. To implement a _mock_ all you have to do is extends from [HttpSoapWebServiceMock|api:grails.plugin.springwsclient.mock.http.HttpSoapWebServiceMock] and provide a service method, see example bellow.
+
+{code}
+class DoublingWebServiceMock extends HttpSoapWebServiceMock {
+
+    void service(req, res) {
+        res.number(xmlns: "n", req.text().toInteger() * 2)
+    }
+}
+{code}
+
+h4.  interceptors:Object[]
+
+List of _interceptors_ that will be triggered *in order when sending* the request and *in reverse order when receiving* the request. To implement an _interceptor_ you need to extend [ClientInterceptor|api:org.springframework.ws.client.support.interceptor.ClientInterceptor]. The example bellow shows a simple _intercepor_ that prints the @request@ and @response@ of the given @MessageContext@. It is based on the [LoggingInterceptor|api:grails.plugin.springwsclient.interceptor.LoggingInterceptor] included in the plugin, note that all methods return @true@ to prevent the interceptor chain from stopping. 
+As an additional reference of a use case is schema validation. If validation is enabled the plugin will use two instances of the [PayloadValidatingInterceptor|api:org.springframework.ws.client.support.interceptor.PayloadValidatingInterceptor] one to validate the _schema_ on each _request_ and one on each _response_. 
+
+{code}
+// example based on the grails.plugin.springwsclient.interceptor.LoggingInterceptor class
+class MessagePrinterInterceptor implements ClientInterceptor {
+
+    boolean handleFault(MessageContext messageContext) {
+        println "Fault detected..."
+        printMessageCtx( messageContext )
+		true 
+	}
+
+	boolean handleRequest(MessageContext messageContext) {
+		println "Handling request..."
+        printMessageCtx( messageContext )
+		true 
+	}
+	
+	boolean handleResponse(MessageContext messageContext) {
+	    println "Handling response..."
+        printMessageCtx( messageContext )
+		true
+	}
+
+    protected printMessageCtx(MessageContext messageContext) {
+        if ( messageContext.request ){
+            println "request: ${messageAsString messageContext.request}"
+        } 
+        if ( messageContext.response ){
+            println "response: ${messageAsString messageContext.response}"
+        } 
+	}
+
+	protected messageAsString(WebServiceMessage message) {
+		def baos = new ByteArrayOutputStream()
+		message.writeTo(baos)
+		
+		def stringWriter = new StringWriter()
+		def node = new XmlParser().parseText(new String(baos.toByteArray()))
+		def printer = new XmlNodePrinter(new PrintWriter(stringWriter))
+		printer.preserveWhitespace = true
+		printer.print(node)
+
+		stringWriter.toString()
+	}
+}
+{code}
+
+h4. marshallerName:String
+
+Serializes the outgoing _message_ object into an XML document that the _endpoint_ will understand. By default the plugin will use the [MarkupBuilderMarshaller|api:grails.plugin.springwsclient.marshalling.MarkupBuilderMarshaller] which with closures to enable Groovy style message building.
+
+Extracted from a @Service@
+{code}
+def doubleIt(num) {
+    doublingWsClient.send { 
+        body {
+            number(xmlns: "n", num.toString())
+        }
+    }.text().toInteger()
+}
+{code}
+
+where the @Closure@ that gets rendered as an XML and defines the _message_ consists of:
+{code}
+{ 
+    body {
+        number(xmlns: "n", num.toString())
+    }
+}
+{code}
+
+h4. unmarshallerName:String
+
+Deserialize a given @javax.xml.transform.Source@ into an @Object@ graph. By default the plugin will use an [XmlSlurperUnmarshaller|api:grails.plugin.springwsclient.marshalling.XmlSlurperUnmarshaller] which returns an [XmlSlurper|api:groovy.util.XmlSlurper] objects representing the _response_ _message_.
+
+h4. messageFactoryName:String or messageFactory:Class
+
+You can specify the [WebServiceMessageFactory|api:org.springframework.ws.WebServiceMessageFactory] instance or the name of the _bean_, available in the _Application Context_, that will be uses ad the _message factory_. As mentioned before plugin uses as a default client _template_ a @GroovyWebServiceTemplate@ which extends from @org.springframework.ws.client.core.WebServiceTemplate@ and therefore uses a [org.springframework.ws.soap.saaj.SaajSoapMessageFactory|api:org.springframework.ws.soap.saaj.SaajSoapMessageFactory] if none is specified.
+
+h4. messageSenderNames:String[]
+
+Names of the _beans_, available through the _Application Context_ that will be used to transport the _messages_. See the "Transport through the WebServiceMessageSenders" section above.
+
+e.g.
+* "CommonsHttpMessageSender":http://static.springsource.org/spring-ws/site/apidocs/org/springframework/ws/transport/http/CommonsHttpMessageSender.html
+
+h4. schema:String[] 
+
+Array of _XSD_ files that will be used to *validate* the _request_ and/or _response_. Note that you can define files that are available through the _File System_ or through the _Class Loader_
+{code}
+schema [ "classpath:schema/number.xsd","/usr/local/share/xsds/checkout.xsd"]
+{code}
+
+h4. validate:( boolean || Map  )
+
+You can validation of _requests_ and  _responses_ by setting the _attribute_ to @true@ or if you want a fine grain approach can specify a _map_ e.g.
+{code}
+ [requests:false, responses:false]
+{code}
+
+h4. log:( boolean || Map )
+
+You can enable logging of _requests_, _responses_ and/or _faults_ by setting the _attribute_ to @true@ or if you want a fine grain approach can specify a _map_ e.g.
+{code}
+ [requests:false, responses:false,  faults:true]
+{code}
+
+
+
+
+
